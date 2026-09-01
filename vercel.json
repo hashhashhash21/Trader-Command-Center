@@ -6,7 +6,8 @@
     "api/validation.js": {"maxDuration": 10},
     "api/calibration.js": {"maxDuration": 10},
     "api/observe.js": {"maxDuration": 60},
-    "api/health.js": {"maxDuration": 10}
+    "api/health.js": {"maxDuration": 10},
+    "api/consensus.js": {"maxDuration": 10}
   },
   "rewrites": [{"source":"/","destination":"/v70.html"}],
   "headers": [
@@ -16,6 +17,7 @@
     {"source":"/api/calibration","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
     {"source":"/api/observe","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
     {"source":"/api/health","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
+    {"source":"/api/consensus","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
     {"source":"/v70.html","headers":[{"key":"Cache-Control","value":"no-store, max-age=0, must-revalidate"}]}
   ]
 }
