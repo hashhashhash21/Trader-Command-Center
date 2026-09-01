@@ -15,14 +15,20 @@
     {
       "source": "/api/market",
       "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        }
+        {"key": "Cache-Control", "value": "no-store, max-age=0"},
+        {"key": "X-Content-Type-Options", "value": "nosniff"}
+      ]
+    },
+    {
+      "source": "/shell.html",
+      "headers": [
+        {"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}
+      ]
+    },
+    {
+      "source": "/Index.html",
+      "headers": [
+        {"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}
       ]
     }
   ]
