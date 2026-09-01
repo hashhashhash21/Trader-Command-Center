@@ -4,20 +4,16 @@
     "api/market.js": {"maxDuration": 10},
     "api/context.js": {"maxDuration": 10},
     "api/validation.js": {"maxDuration": 10},
-    "api/calibration.js": {"maxDuration": 10}
+    "api/calibration.js": {"maxDuration": 10},
+    "api/observe.js": {"maxDuration": 60}
   },
-  "rewrites": [
-    {"source": "/", "destination": "/v69.html"}
-  ],
+  "rewrites": [{"source":"/","destination":"/v69.html"}],
   "headers": [
-    {"source": "/api/market", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
-    {"source": "/api/context", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
-    {"source": "/api/validation", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
-    {"source": "/api/calibration", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
-    {"source": "/v69.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
-    {"source": "/v68.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
-    {"source": "/v67.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
-    {"source": "/shell.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
-    {"source": "/Index.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]}
+    {"source":"/api/market","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
+    {"source":"/api/context","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
+    {"source":"/api/validation","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
+    {"source":"/api/calibration","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
+    {"source":"/api/observe","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
+    {"source":"/v69.html","headers":[{"key":"Cache-Control","value":"no-store, max-age=0, must-revalidate"}]}
   ]
 }
