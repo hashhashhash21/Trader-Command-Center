@@ -1,15 +1,11 @@
 {
   "version": 2,
   "functions": {
-    "api/market.js": {
-      "maxDuration": 10
-    }
+    "api/market.js": {"maxDuration": 10},
+    "api/context.js": {"maxDuration": 10}
   },
   "rewrites": [
-    {
-      "source": "/",
-      "destination": "/shell.html"
-    }
+    {"source": "/", "destination": "/shell.html"}
   ],
   "headers": [
     {
@@ -20,16 +16,27 @@
       ]
     },
     {
-      "source": "/shell.html",
+      "source": "/api/context",
       "headers": [
-        {"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}
+        {"key": "Cache-Control", "value": "no-store, max-age=0"},
+        {"key": "X-Content-Type-Options", "value": "nosniff"}
       ]
     },
     {
+      "source": "/shell.html",
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]
+    },
+    {
       "source": "/Index.html",
-      "headers": [
-        {"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}
-      ]
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]
+    },
+    {
+      "source": "/quality.js",
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]
+    },
+    {
+      "source": "/advanced.js",
+      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]
     }
   ]
 }
