@@ -3,20 +3,24 @@
   "functions": {
     "api/market.js": {"maxDuration": 10},
     "api/context.js": {"maxDuration": 10},
-    "api/validation.js": {"maxDuration": 10}
+    "api/validation.js": {"maxDuration": 10},
+    "api/calibration.js": {"maxDuration": 10}
   },
   "rewrites": [
-    {"source": "/", "destination": "/v67.html"}
+    {"source": "/", "destination": "/v68.html"}
   ],
   "headers": [
     {"source": "/api/market", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
     {"source": "/api/context", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
     {"source": "/api/validation", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
+    {"source": "/api/calibration", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
+    {"source": "/v68.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
     {"source": "/v67.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
     {"source": "/shell.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
     {"source": "/Index.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
     {"source": "/quality.js", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
     {"source": "/advanced.js", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
-    {"source": "/validation.js", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]}
+    {"source": "/validation.js", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
+    {"source": "/calibration.js", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]}
   ]
 }
