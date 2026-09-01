@@ -1,7 +1,7 @@
 name: TCC CI
 on:
   push:
-    branches: [main]
+    branches: [main, v73-2-work]
   pull_request:
     branches: [main]
 jobs:
@@ -14,6 +14,7 @@ jobs:
           node-version: '22'
       - run: node --test tests/*.test.js
       - run: node --check lib/engine.js
+      - run: node --check lib/instruments.js
       - run: node --check api/market.js
       - run: node --check api/validation.js
       - run: node --check api/calibration.js
@@ -23,3 +24,4 @@ jobs:
       - run: node --check api/health.js
       - run: node --check api/snapshot.js
       - run: node --check api/spot-snapshot.js
+      - run: node --check api/instruments.js
