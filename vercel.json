@@ -8,7 +8,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/Index.html"
+      "destination": "/shell.html"
     }
   ],
   "headers": [
