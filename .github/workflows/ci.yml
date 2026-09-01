@@ -22,3 +22,4 @@ jobs:
       - run: node --check api/consensus.js
       - run: node --check api/health.js
       - run: node --check api/snapshot.js
+      - run: node --check api/spot-snapshot.js
