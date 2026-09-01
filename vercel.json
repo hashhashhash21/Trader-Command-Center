@@ -2,41 +2,21 @@
   "version": 2,
   "functions": {
     "api/market.js": {"maxDuration": 10},
-    "api/context.js": {"maxDuration": 10}
+    "api/context.js": {"maxDuration": 10},
+    "api/validation.js": {"maxDuration": 10}
   },
   "rewrites": [
-    {"source": "/", "destination": "/shell.html"}
+    {"source": "/", "destination": "/v67.html"}
   ],
   "headers": [
-    {
-      "source": "/api/market",
-      "headers": [
-        {"key": "Cache-Control", "value": "no-store, max-age=0"},
-        {"key": "X-Content-Type-Options", "value": "nosniff"}
-      ]
-    },
-    {
-      "source": "/api/context",
-      "headers": [
-        {"key": "Cache-Control", "value": "no-store, max-age=0"},
-        {"key": "X-Content-Type-Options", "value": "nosniff"}
-      ]
-    },
-    {
-      "source": "/shell.html",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]
-    },
-    {
-      "source": "/Index.html",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]
-    },
-    {
-      "source": "/quality.js",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]
-    },
-    {
-      "source": "/advanced.js",
-      "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]
-    }
+    {"source": "/api/market", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
+    {"source": "/api/context", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
+    {"source": "/api/validation", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0"},{"key": "X-Content-Type-Options", "value": "nosniff"}]},
+    {"source": "/v67.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
+    {"source": "/shell.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
+    {"source": "/Index.html", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
+    {"source": "/quality.js", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
+    {"source": "/advanced.js", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]},
+    {"source": "/validation.js", "headers": [{"key": "Cache-Control", "value": "no-store, max-age=0, must-revalidate"}]}
   ]
 }
