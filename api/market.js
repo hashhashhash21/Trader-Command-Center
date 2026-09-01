@@ -6,6 +6,7 @@ const ALLOWED = {
       "/fapi/v1/ticker/24hr",
       "/fapi/v1/ticker/bookTicker",
       "/fapi/v1/klines",
+      "/fapi/v1/depth",
       "/fapi/v1/openInterest",
       "/fapi/v1/premiumIndex"
     ]
@@ -16,7 +17,8 @@ const ALLOWED = {
       "/api/v3/ticker/price",
       "/api/v3/ticker/24hr",
       "/api/v3/ticker/bookTicker",
-      "/api/v3/klines"
+      "/api/v3/klines",
+      "/api/v3/depth"
     ]
   }
 };
@@ -26,7 +28,8 @@ const FUTURES_TO_SPOT = Object.freeze({
   "/fapi/v1/ticker/price": "/api/v3/ticker/price",
   "/fapi/v1/ticker/24hr": "/api/v3/ticker/24hr",
   "/fapi/v1/ticker/bookTicker": "/api/v3/ticker/bookTicker",
-  "/fapi/v1/klines": "/api/v3/klines"
+  "/fapi/v1/klines": "/api/v3/klines",
+  "/fapi/v1/depth": "/api/v3/depth"
 });
 
 function validPath(market, raw) {
@@ -51,13 +54,13 @@ function validPath(market, raw) {
   return { pathname: u.pathname, search: u.search };
 }
 
-async function fetchJson(url, timeoutMs = 6500) {
+async function fetchJson(url, timeoutMs = 5000) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const response = await fetch(url, {
       signal: controller.signal,
-      headers: { "Accept": "application/json", "User-Agent": "Trader-Command-Center/65.1" }
+      headers: { "Accept": "application/json", "User-Agent": "Trader-Command-Center/65.14" }
     });
     const text = await response.text();
     let data;
@@ -87,12 +90,17 @@ module.exports = async function handler(req, res) {
   try {
     const primary = await fetchJson(ALLOWED[market].origin + path);
     if (primary.ok) {
-      return res.status(200).json({ __tccProxy: true, market, source: market === "futures" ? "binance-futures" : "binance-spot", degraded: false, data: primary.data });
+      return res.status(200).json({
+        __tccProxy: true,
+        market,
+        source: market === "futures" ? "binance-futures" : "binance-spot",
+        degraded: false,
+        requestedMarket: market,
+        capabilities: { derivatives: market === "futures" },
+        data: primary.data
+      });
     }
 
-    // Vercel regions can receive Binance eligibility/geo responses. For core
-    // market-data endpoints only, fall back to Binance's public SPOT market-data
-    // host. Never label this as futures data.
     const mapped = market === "futures" ? FUTURES_TO_SPOT[parsed.pathname] : parsed.pathname;
     const shouldFallback = Boolean(mapped) && [403, 418, 451].includes(primary.status);
     if (shouldFallback) {
@@ -100,20 +108,32 @@ module.exports = async function handler(req, res) {
       if (fallback.ok) {
         return res.status(200).json({
           __tccProxy: true,
-          market,
+          market: "spot",
           source: "public-spot-fallback",
-          degraded: market === "futures",
+          degraded: true,
           requestedMarket: market,
           upstreamStatus: primary.status,
+          capabilities: { derivatives: false },
           data: fallback.data
         });
       }
-      return res.status(502).json({ error: "Market-data fallback unavailable", upstreamStatus: primary.status, fallbackStatus: fallback.status, data: fallback.data });
+      return res.status(502).json({
+        error: "Market-data fallback unavailable",
+        upstreamStatus: primary.status,
+        fallbackStatus: fallback.status
+      });
     }
 
-    return res.status(primary.status).json({ error: "Binance upstream error", upstreamStatus: primary.status, data: primary.data });
+    return res.status(primary.status).json({
+      error: "Binance upstream error",
+      upstreamStatus: primary.status,
+      unavailable: market === "futures" && !FUTURES_TO_SPOT[parsed.pathname],
+      data: primary.data
+    });
   } catch (error) {
     const timeout = error?.name === "AbortError";
-    return res.status(timeout ? 504 : 502).json({ error: timeout ? "Market upstream timeout" : "Market upstream unavailable" });
+    return res.status(timeout ? 504 : 502).json({
+      error: timeout ? "Market upstream timeout" : "Market upstream unavailable"
+    });
   }
 };
