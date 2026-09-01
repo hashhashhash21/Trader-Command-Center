@@ -24,6 +24,7 @@ const ALLOWED = {
 };
 
 const PUBLIC_SPOT_ORIGIN = "https://data-api.binance.vision";
+const BYBIT_ORIGIN = "https://api.bybit.com";
 const FUTURES_TO_SPOT = Object.freeze({
   "/fapi/v1/ticker/price": "/api/v3/ticker/price",
   "/fapi/v1/ticker/24hr": "/api/v3/ticker/24hr",
@@ -37,10 +38,8 @@ function validPath(market, raw) {
   let u;
   try { u = new URL(raw, "https://tcc.invalid"); } catch { return null; }
   if (u.origin !== "https://tcc.invalid" || !ALLOWED[market]?.paths.includes(u.pathname)) return null;
-
   const allowedParams = new Set(["symbol", "interval", "limit", "endTime", "startTime"]);
   for (const key of u.searchParams.keys()) if (!allowedParams.has(key)) return null;
-
   const symbol = u.searchParams.get("symbol");
   if (symbol && !/^[A-Z0-9]{3,24}$/.test(symbol)) return null;
   const interval = u.searchParams.get("interval");
@@ -51,7 +50,7 @@ function validPath(market, raw) {
     const value = u.searchParams.get(key);
     if (value && (!/^\d{10,16}$/.test(value) || !Number.isFinite(+value))) return null;
   }
-  return { pathname: u.pathname, search: u.search };
+  return { pathname: u.pathname, search: u.search, params: u.searchParams };
 }
 
 async function fetchJson(url, timeoutMs = 5000) {
@@ -60,21 +59,53 @@ async function fetchJson(url, timeoutMs = 5000) {
   try {
     const response = await fetch(url, {
       signal: controller.signal,
-      headers: { "Accept": "application/json", "User-Agent": "Trader-Command-Center/65.14" }
+      headers: { "Accept": "application/json", "User-Agent": "Trader-Command-Center/65.17" }
     });
     const text = await response.text();
     let data;
     try { data = JSON.parse(text); } catch { data = { raw: text.slice(0, 1000) }; }
     return { ok: response.ok, status: response.status, data };
-  } finally {
-    clearTimeout(timer);
+  } finally { clearTimeout(timer); }
+}
+
+async function bybitDerivativesFallback(pathname, symbol) {
+  if (!symbol || !symbol.endsWith("USDT")) return null;
+  const url = `${BYBIT_ORIGIN}/v5/market/tickers?category=linear&symbol=${encodeURIComponent(symbol)}`;
+  const r = await fetchJson(url, 4500);
+  const row = r.data?.result?.list?.[0];
+  if (!r.ok || r.data?.retCode !== 0 || !row) return null;
+  const now = Date.now();
+  if (pathname === "/fapi/v1/openInterest") {
+    const oi = Number(row.openInterest);
+    if (!Number.isFinite(oi)) return null;
+    return {
+      source: "bybit-linear-fallback",
+      data: { symbol, openInterest: String(row.openInterest), time: now },
+      meta: { provider: "Bybit", instrument: "linear-perpetual", unit: "contracts/base-asset" }
+    };
   }
+  if (pathname === "/fapi/v1/premiumIndex") {
+    const fr = Number(row.fundingRate);
+    if (!Number.isFinite(fr)) return null;
+    return {
+      source: "bybit-linear-fallback",
+      data: {
+        symbol,
+        markPrice: row.markPrice ?? null,
+        indexPrice: row.indexPrice ?? null,
+        lastFundingRate: String(row.fundingRate),
+        nextFundingTime: Number(row.nextFundingTime) || null,
+        time: now
+      },
+      meta: { provider: "Bybit", instrument: "linear-perpetual", fundingRatePeriod: "venue-defined" }
+    };
+  }
+  return null;
 }
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store, max-age=0");
   res.setHeader("X-Content-Type-Options", "nosniff");
-
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
     return res.status(405).json({ error: "Method not allowed" });
@@ -82,10 +113,10 @@ module.exports = async function handler(req, res) {
 
   const market = String(req.query?.market || "").toLowerCase();
   if (!ALLOWED[market]) return res.status(400).json({ error: "Invalid market" });
-
   const parsed = validPath(market, String(req.query?.path || ""));
-  if (!parsed) return res.status(400).json({ error: "Invalid or unsupported Binance path" });
+  if (!parsed) return res.status(400).json({ error: "Invalid or unsupported market-data path" });
   const path = parsed.pathname + parsed.search;
+  const symbol = parsed.params.get("symbol");
 
   try {
     const primary = await fetchJson(ALLOWED[market].origin + path);
@@ -101,33 +132,46 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const mapped = market === "futures" ? FUTURES_TO_SPOT[parsed.pathname] : parsed.pathname;
-    const shouldFallback = Boolean(mapped) && [403, 418, 451].includes(primary.status);
-    if (shouldFallback) {
-      const fallback = await fetchJson(PUBLIC_SPOT_ORIGIN + mapped + parsed.search);
-      if (fallback.ok) {
-        return res.status(200).json({
-          __tccProxy: true,
-          market: "spot",
-          source: "public-spot-fallback",
-          degraded: true,
-          requestedMarket: market,
-          upstreamStatus: primary.status,
-          capabilities: { derivatives: false },
-          data: fallback.data
-        });
+    if (market === "futures" && [403, 418, 451].includes(primary.status)) {
+      if (parsed.pathname === "/fapi/v1/openInterest" || parsed.pathname === "/fapi/v1/premiumIndex") {
+        const alt = await bybitDerivativesFallback(parsed.pathname, symbol);
+        if (alt) {
+          return res.status(200).json({
+            __tccProxy: true,
+            market: "futures",
+            source: alt.source,
+            degraded: true,
+            requestedMarket: market,
+            upstreamStatus: primary.status,
+            capabilities: { derivatives: true, crossVenue: true },
+            providerMeta: alt.meta,
+            data: alt.data
+          });
+        }
       }
-      return res.status(502).json({
-        error: "Market-data fallback unavailable",
-        upstreamStatus: primary.status,
-        fallbackStatus: fallback.status
-      });
+
+      const mapped = FUTURES_TO_SPOT[parsed.pathname];
+      if (mapped) {
+        const fallback = await fetchJson(PUBLIC_SPOT_ORIGIN + mapped + parsed.search);
+        if (fallback.ok) {
+          return res.status(200).json({
+            __tccProxy: true,
+            market: "spot",
+            source: "public-spot-fallback",
+            degraded: true,
+            requestedMarket: market,
+            upstreamStatus: primary.status,
+            capabilities: { derivatives: false },
+            data: fallback.data
+          });
+        }
+      }
     }
 
     return res.status(primary.status).json({
-      error: "Binance upstream error",
+      error: "Market upstream error",
       upstreamStatus: primary.status,
-      unavailable: market === "futures" && !FUTURES_TO_SPOT[parsed.pathname],
+      unavailable: true,
       data: primary.data
     });
   } catch (error) {
