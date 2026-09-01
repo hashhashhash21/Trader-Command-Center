@@ -1,23 +1,12 @@
 {
   "version": 2,
   "functions": {
-    "api/market.js": {"maxDuration": 10},
-    "api/context.js": {"maxDuration": 10},
-    "api/validation.js": {"maxDuration": 10},
-    "api/calibration.js": {"maxDuration": 10},
-    "api/observe.js": {"maxDuration": 60},
-    "api/health.js": {"maxDuration": 10},
-    "api/consensus.js": {"maxDuration": 10}
+    "api/market.js":{"maxDuration":10},"api/context.js":{"maxDuration":10},"api/validation.js":{"maxDuration":10},"api/calibration.js":{"maxDuration":10},"api/observe.js":{"maxDuration":60},"api/evaluate.js":{"maxDuration":60},"api/health.js":{"maxDuration":10},"api/consensus.js":{"maxDuration":10}
   },
-  "rewrites": [{"source":"/","destination":"/v71.html"}],
-  "headers": [
-    {"source":"/api/market","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
-    {"source":"/api/context","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
-    {"source":"/api/validation","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
-    {"source":"/api/calibration","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
-    {"source":"/api/observe","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
-    {"source":"/api/health","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
-    {"source":"/api/consensus","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"},{"key":"X-Content-Type-Options","value":"nosniff"}]},
+  "rewrites":[{"source":"/","destination":"/v71.html"}],
+  "headers":[
+    {"source":"/(.*)","headers":[{"key":"X-Content-Type-Options","value":"nosniff"},{"key":"Referrer-Policy","value":"strict-origin-when-cross-origin"},{"key":"X-Frame-Options","value":"DENY"},{"key":"Permissions-Policy","value":"camera=(), microphone=(), geolocation=()"}]},
+    {"source":"/api/(.*)","headers":[{"key":"Cache-Control","value":"no-store, max-age=0"}]},
     {"source":"/v71.html","headers":[{"key":"Cache-Control","value":"no-store, max-age=0, must-revalidate"}]}
   ]
 }
