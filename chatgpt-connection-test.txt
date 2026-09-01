@@ -1,0 +1,4 @@
+ChatGPT GitHub connection test.
+
+This file confirms that the connected ChatGPT GitHub integration can create and edit repository files.
+Test date: 2026-09-01
