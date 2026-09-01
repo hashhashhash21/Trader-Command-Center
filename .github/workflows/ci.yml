@@ -13,8 +13,10 @@ jobs:
         with:
           node-version: '22'
       - run: node --test tests/*.test.js
+      - run: node --check api/market.js
       - run: node --check api/validation.js
       - run: node --check api/calibration.js
       - run: node --check api/observe.js
+      - run: node --check api/evaluate.js
       - run: node --check api/consensus.js
       - run: node --check api/health.js
