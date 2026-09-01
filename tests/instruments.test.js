@@ -1,0 +1,4 @@
+const test=require('node:test');const assert=require('node:assert/strict');const {getInstrument,listInstruments,validationSymbols}=require('../lib/instruments');
+test('BTC and ETH are futures validation instruments',()=>{for(const s of ['BTCUSDT','ETHUSDT']){const x=getInstrument(s);assert.equal(x.marketClass,'futures');assert.equal(x.validationEligible,true);assert.equal(x.snapshotEndpoint,'/api/snapshot')}});
+test('BMNRB is spot only and excluded from futures validation',()=>{const x=getInstrument('BMNRBUSDT');assert.equal(x.marketClass,'spot');assert.equal(x.venue,'binance-spot');assert.equal(x.validationEligible,false);assert.equal(x.snapshotEndpoint,'/api/spot-snapshot');assert.ok(!validationSymbols().includes('BMNRBUSDT'))});
+test('instrument symbols are unique',()=>{const xs=listInstruments().map(x=>x.symbol);assert.equal(new Set(xs).size,xs.length)});
