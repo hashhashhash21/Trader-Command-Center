@@ -21,3 +21,4 @@ create table if not exists tcc_observations (
 );
 create index if not exists tcc_observations_symbol_time_idx on tcc_observations(symbol, observed_at desc);
 create index if not exists tcc_observations_due_idx on tcc_observations(observed_at) where not evaluated_4h;
+create unique index if not exists tcc_observations_symbol_observed_unique on tcc_observations(symbol, observed_at);
