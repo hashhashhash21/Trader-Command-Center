@@ -1,0 +1,6 @@
+const test=require('node:test');const assert=require('node:assert/strict');const {directionalSuccess,wilson,sampleStatus,directionalStats}=require('../lib/analytics');
+test('bullish and bearish directional scoring',()=>{assert.equal(directionalSuccess('BULLISH',.5),true);assert.equal(directionalSuccess('BULLISH',-.5),false);assert.equal(directionalSuccess('BEARISH',-.5),true);assert.equal(directionalSuccess('MIXED',.5),null)});
+test('sample status thresholds',()=>{assert.equal(sampleStatus(19),'INSUFFICIENT');assert.equal(sampleStatus(20),'LIMITED');assert.equal(sampleStatus(50),'EARLY');assert.equal(sampleStatus(150),'MATURE')});
+test('wilson interval contracts around estimate',()=>{const x=wilson(70,100);assert.ok(x.low<70&&x.high>70);assert.ok(x.low>=0&&x.high<=100)});
+test('accuracy hidden before 20 directional samples',()=>{const rows=Array.from({length:19},(_,i)=>({state:'BULLISH',outcome_15m:i<10?.1:-.1})),s=directionalStats(rows,'15m');assert.equal(s.directionalSamples,19);assert.equal(s.directionalAccuracy,null);assert.equal(s.directionalCI95,null)});
+test('accuracy and interval exposed at 20 samples',()=>{const rows=Array.from({length:20},(_,i)=>({state:'BULLISH',outcome_15m:i<12?.1:-.1})),s=directionalStats(rows,'15m');assert.equal(s.directionalAccuracy,60);assert.ok(s.directionalCI95.low<60&&s.directionalCI95.high>60)});
