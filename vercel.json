@@ -1,7 +1,7 @@
 {
   "version":2,
   "functions":{
-    "api/market.js":{"maxDuration":10},"api/context.js":{"maxDuration":10},"api/validation.js":{"maxDuration":10},"api/calibration.js":{"maxDuration":10},"api/observe.js":{"maxDuration":60},"api/evaluate.js":{"maxDuration":60},"api/health.js":{"maxDuration":10},"api/consensus.js":{"maxDuration":10},"api/snapshot.js":{"maxDuration":10},"api/spot-snapshot.js":{"maxDuration":10}
+    "api/market.js":{"maxDuration":10},"api/context.js":{"maxDuration":10},"api/validation.js":{"maxDuration":10},"api/calibration.js":{"maxDuration":10},"api/observe.js":{"maxDuration":60},"api/evaluate.js":{"maxDuration":60},"api/health.js":{"maxDuration":10},"api/consensus.js":{"maxDuration":10},"api/snapshot.js":{"maxDuration":10},"api/spot-snapshot.js":{"maxDuration":10},"api/instruments.js":{"maxDuration":10}
   },
   "rewrites":[{"source":"/","destination":"/v73.html"}],
   "headers":[
