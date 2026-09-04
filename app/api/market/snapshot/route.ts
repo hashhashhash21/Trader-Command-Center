@@ -14,7 +14,7 @@ export async function GET(){
   btc=crypto[0].status==="fulfilled"?crypto[0].value:null;eth=crypto[1].status==="fulfilled"?crypto[1].value:null;bm=crypto[2].status==="fulfilled"?crypto[2].value:null;
   health.push({name:"Binance",state:btc&&eth?"LIVE":"DEGRADED",latencyMs:Date.now()-started,detail:"Public Futures / Spot"});
   const usResults=await Promise.all(US_SYMBOLS.map(async s=>{try{return await usQuote(s)}catch{return unavailable(s,"US API NOT CONFIGURED")}}));
-  const usMap=Object.fromEntries(usResults.map(q=>[q.symbol,q]));health.push({name:"Alpaca",state:usResults.some(x=>x.source.includes("Alpaca"))?"IEX":"NOT CONFIGURED",latencyMs:null,detail:usResults.some(x=>x.source.includes("Alpaca"))?"IEX":"Optional"});
+  const usMap=Object.fromEntries(usResults.map(q=>[q.symbol,q]));const usLive=usResults.find(x=>x.price!=null&&!x.source.includes("NOT CONFIGURED")),usIsIex=!!usLive?.source.includes("Alpaca");health.push({name:"US Market",state:usLive?(usIsIex?"IEX":"LIVE"):"NOT CONFIGURED",latencyMs:null,detail:usLive?.source||"Optional"});
   const sectorSymbols=["SOXX","NVDA","AMD","AVGO","TSM"];const sector=sectorSymbols.map(s=>usMap[s]).filter(Boolean);const changes=sector.map(q=>q.change24h).filter((x):x is number=>x!=null);const sectorBias=changes.length>=3?changes.reduce((a,b)=>a+Math.sign(b),0)/changes.length:null;
   const news=await Promise.all(["BMNR","BMNU","SOXL","SOXS"].map(s=>companyNews(s).catch(()=>({score:null,headlines:0,source:"Unavailable",items:[]}))));
   health.push({name:"News",state:news.some(n=>n.headlines>0)?"LIVE":"NOT CONFIGURED",latencyMs:null,detail:news.some(n=>n.headlines>0)?news.reduce((a,n)=>a+n.headlines,0)+" headlines":"—"});
