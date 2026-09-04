@@ -36,6 +36,12 @@
     },
     "api/pretrade.js": {
       "maxDuration": 15
+    },
+    "api/us-snapshot.js": {
+      "maxDuration": 10
+    },
+    "api/hourly.js": {
+      "maxDuration": 20
     }
   },
   "rewrites": [
