@@ -1,0 +1,5 @@
+const test=require('node:test');const assert=require('node:assert/strict');const {distance,equitySignal}=require('../lib/hourly');
+test('null prices never become zero distances',()=>{assert.equal(distance(null,10,'down'),null);assert.equal(distance(10,null,'up'),null);assert.equal(distance(0,10,'up'),null)});
+test('unavailable US quote always waits',()=>{assert.equal(equitySignal({available:false}).actionLabel,'WAIT')});
+test('US signal requires multiple verified inputs',()=>{assert.equal(equitySignal({available:true,price:10,vwap:null,support:null,resistance:null}).actionLabel,'WAIT')});
+test('strong US structure can create buy bias without fixed confidence',()=>{const x=equitySignal({available:true,price:12,vwap:10,relativeVolume:1.5,bid:11.99,ask:12.01,support:10.5,resistance:12.5,atr:.3});assert.equal(x.actionLabel,'BUY BIAS');assert.notEqual(x.confidence,null)});
