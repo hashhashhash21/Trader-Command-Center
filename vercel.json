@@ -42,6 +42,12 @@
     },
     "api/hourly.js": {
       "maxDuration": 20
+    },
+    "api/us-context.js": {
+      "maxDuration": 20
+    },
+    "api/news-sentiment.js": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
