@@ -1,0 +1,7 @@
+const {configured,getSnapshot}=require('../lib/us-market');const {num}=require('../lib/pretrade');
+const SYMBOLS=['SOXX','NVDA','AMD','AVGO','TSM','MU'];
+function ret(x){const p=num(x?.price),pc=num(x?.previousClose);return p!=null&&pc?100*(p-pc)/pc:null}
+module.exports=async(req,res)=>{res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json');if(req.method!=='GET')return res.status(405).json({error:'Method not allowed'});if(!configured())return res.status(200).json({configured:false,available:false,symbols:SYMBOLS});
+ const rows=await Promise.all(SYMBOLS.map(async s=>{try{const x=await getSnapshot(s);return{symbol:s,available:!!x&&num(x.price)!=null,price:num(x?.price),changePct:ret(x),source:x?.source||null,observedAt:x?.observedAt||null}}catch(e){return{symbol:s,available:false,error:e.message}}}));
+ const valid=rows.filter(x=>x.available&&x.changePct!=null),bull=valid.filter(x=>x.changePct>0).length,bear=valid.filter(x=>x.changePct<0).length,avg=valid.length?valid.reduce((a,x)=>a+x.changePct,0)/valid.length:null;let state='INSUFFICIENT';if(valid.length>=4)state=bull>=4&&avg>0?'BULLISH':bear>=4&&avg<0?'BEARISH':'MIXED';
+ return res.status(200).json({configured:true,available:valid.length>=4,state,averageChangePct:avg,bullishCount:bull,bearishCount:bear,rows,note:'Sector confirmation uses directly observed U.S. market prices only; missing components are excluded.'})};
