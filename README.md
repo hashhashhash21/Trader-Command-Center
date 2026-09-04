@@ -20,7 +20,7 @@ The default adapter requests Alpaca IEX. The UI identifies the source as Alpaca 
 
 ## Optional providers
 
-FINNHUB_API_KEY enables optional recent company news. Environment placeholders are included for Twelve Data and Alpha Vantage for future fallback adapters. Missing providers do not crash the dashboard.
+FINNHUB_API_KEY enables optional recent company news. Twelve Data, Finnhub and Alpha Vantage server-side fallback adapters are included and can be ordered with US_MARKET_FALLBACKS. Missing providers do not crash the dashboard.
 
 ## Free-feed limitations
 
