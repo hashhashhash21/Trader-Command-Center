@@ -1,0 +1,9 @@
+const test=require('node:test');const assert=require('node:assert/strict');const {deriveDecision,tradePlan}=require('../lib/pretrade');
+const up={m5:{state:'UP'},m15:{state:'UP'},h1:{state:'UP'},h4:{state:'MIXED'}},down={m5:{state:'DOWN'},m15:{state:'DOWN'},h1:{state:'DOWN'},h4:{state:'MIXED'}};
+function bars(start=100,n=40,step=.3){return Array.from({length:n},(_,i)=>{const c=start+i*step;return [i,c-.1,c+.4,c-.5,c,10]})}
+test('poor futures quality forces no trade',()=>{assert.equal(deriveDecision({marketClass:'futures',evidence:80,quality:40,fresh:true,mtf:up,consensus:'CONFIRMED',available:true}).decision,'NO TRADE')});
+test('stale snapshot forces no trade',()=>{assert.equal(deriveDecision({marketClass:'futures',evidence:80,quality:95,fresh:false,mtf:up,consensus:'CONFIRMED',available:true}).decision,'NO TRADE')});
+test('bullish aligned futures can produce long bias',()=>{assert.equal(deriveDecision({marketClass:'futures',evidence:75,quality:95,fresh:true,mtf:up,consensus:'CONFIRMED',available:true}).decision,'LONG BIAS')});
+test('bearish aligned futures can produce short bias',()=>{assert.equal(deriveDecision({marketClass:'futures',evidence:25,quality:95,fresh:true,mtf:down,consensus:'CONFIRMED',available:true}).decision,'SHORT BIAS')});
+test('venue divergence blocks directional bias',()=>{assert.equal(deriveDecision({marketClass:'futures',evidence:75,quality:95,fresh:true,mtf:up,consensus:'DIVERGENT',available:true}).decision,'WAIT')});
+test('trade plan requires a directional decision',()=>{assert.equal(tradePlan({decision:'WAIT',price:100,rows:bars()}),null);assert.ok(tradePlan({decision:'LONG BIAS',price:112,rows:bars()}))});
