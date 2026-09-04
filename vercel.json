@@ -47,7 +47,7 @@
   "rewrites": [
     {
       "source": "/",
-      "destination": "/v74.html"
+      "destination": "/v75.html"
     }
   ],
   "headers": [
@@ -78,6 +78,15 @@
         {
           "key": "Cache-Control",
           "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/v75.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0, must-revalidate"
         }
       ]
     },
