@@ -16,6 +16,7 @@ jobs:
       - run: node --check lib/engine.js
       - run: node --check lib/instruments.js
       - run: node --check lib/pretrade.js
+      - run: node --check lib/hourly.js
       - run: node --check api/market.js
       - run: node --check api/validation.js
       - run: node --check api/calibration.js
@@ -27,3 +28,5 @@ jobs:
       - run: node --check api/spot-snapshot.js
       - run: node --check api/instruments.js
       - run: node --check api/pretrade.js
+      - run: node --check api/us-snapshot.js
+      - run: node --check api/hourly.js
