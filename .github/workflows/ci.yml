@@ -17,6 +17,7 @@ jobs:
       - run: node --check lib/instruments.js
       - run: node --check lib/pretrade.js
       - run: node --check lib/hourly.js
+      - run: node --check lib/us-market.js
       - run: node --check api/market.js
       - run: node --check api/validation.js
       - run: node --check api/calibration.js
@@ -30,3 +31,5 @@ jobs:
       - run: node --check api/pretrade.js
       - run: node --check api/us-snapshot.js
       - run: node --check api/hourly.js
+      - run: node --check api/us-context.js
+      - run: node --check api/news-sentiment.js
